@@ -6,31 +6,32 @@
 ---
 
 ## Repository Structure
-
-.
+```text
 ├── README.md
 ├── requirements.txt
 │
 ├── notebooks/
-│ └── task1_ab_test.ipynb # Main analysis & visualizations
+│   └── task1_ab_test.ipynb          # Main analysis & visualizations
 │
 ├── src/
-│ └── abtest/
-│ ├── init.py
-│ ├── config.py # Constants and experiment settings
-│ ├── retention.py # Retention curve modeling
-│ ├── dau.py # DAU simulation utilities
-│ ├── monetization.py # Revenue model (ads + IAP + sale)
-│ └── scenarios.py # Scenario helpers
+│   └── abtest/
+│       ├── __init__.py
+│       ├── config.py                # Constants and experiment settings
+│       ├── retention.py             # Retention curve modeling
+│       ├── dau.py                   # DAU simulation utilities
+│       ├── monetization.py          # Revenue model (ads + IAP + sale)
+│       └── scenarios.py             # Scenario helpers
 │
 └── outputs/
-└── figures/ # Saved plots for README
-├── cumulative_rev_15days.png
-├── cumulative_rev_30days.png
-├── cumulative_rev_with_10day_sale.png
-├── cumulative_rev_with_new_source.png
-├── sale_vs_new_source.png
-└── dau_over_15_days.png
+    └── figures/                     # Saved plots for README
+        ├── cumulative_rev_15days.png
+        ├── cumulative_rev_30days.png
+        ├── cumulative_rev_with_10day_sale.png
+        ├── cumulative_rev_with_new_source.png
+        ├── sale_vs_new_source.png
+        └── dau_over_15_days.png
+```
+
 
 The notebook automatically imports reusable functions from src/abtest/.
 
