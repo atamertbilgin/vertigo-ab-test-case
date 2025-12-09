@@ -2,6 +2,13 @@
 **Author:** Atamert Bilgin  
 **Tools:** Python, NumPy, Pandas, Matplotlib, Jupyter Notebook, Big Query
 
+## This repository contains my solution for Vertigo Games’ Data Analyst case study.  
+The project covers two major areas:
+1. A/B Test modeling and long-term revenue simulation.
+2. User behavior & segmentation using real game data.
+
+The goal is to demonstrate analytical thinking, modeling, and ability to extract actionable insights from gameplay data.
+
 ---
 
 ## Repository Structure
