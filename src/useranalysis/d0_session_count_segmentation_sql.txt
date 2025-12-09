@@ -1,0 +1,51 @@
+-- 1) D0 (install day) session-count segmentation
+WITH d0 AS (
+  SELECT
+    user_id,
+    install_date,
+    total_session_count,
+    CASE
+      WHEN total_session_count = 1 THEN '1 session'
+      WHEN total_session_count = 2 THEN '2 sessions'
+      WHEN total_session_count BETWEEN 3 AND 4 THEN '3-4 sessions'
+      ELSE '4+ sessions'
+    END AS session_segment
+  FROM `vertigo-casestudy.dataset.alldata`
+  WHERE event_date = install_date
+    AND install_date BETWEEN '2024-02-15' AND '2024-03-15'
+),
+
+-- 2) Retention flags per user/segment
+retention AS (
+  SELECT
+    d0.session_segment,
+    d0.user_id,
+    MAX(CASE WHEN a.event_date = DATE_ADD(d0.install_date, INTERVAL 1 DAY)  THEN 1 ELSE 0 END) AS d1_ret,
+    MAX(CASE WHEN a.event_date = DATE_ADD(d0.install_date, INTERVAL 3 DAY)  THEN 1 ELSE 0 END) AS d3_ret,
+    MAX(CASE WHEN a.event_date = DATE_ADD(d0.install_date, INTERVAL 7 DAY)  THEN 1 ELSE 0 END) AS d7_ret,
+    MAX(CASE WHEN a.event_date = DATE_ADD(d0.install_date, INTERVAL 14 DAY) THEN 1 ELSE 0 END) AS d14_ret,
+    MAX(CASE WHEN a.event_date = DATE_ADD(d0.install_date, INTERVAL 21 DAY) THEN 1 ELSE 0 END) AS d21_ret
+  FROM d0
+  LEFT JOIN `vertigo-casestudy.dataset.alldata` a
+    ON a.user_id = d0.user_id
+  GROUP BY 1, 2
+)
+
+-- 3) Aggregate retention rates per session-count segment
+SELECT
+  session_segment,
+  COUNT(*) AS users,
+  AVG(d1_ret)  AS d1_retention,
+  AVG(d3_ret)  AS d3_retention,
+  AVG(d7_ret)  AS d7_retention,
+  AVG(d14_ret) AS d14_retention,
+  AVG(d21_ret) AS d21_retention
+FROM retention
+GROUP BY session_segment
+ORDER BY
+  CASE session_segment
+    WHEN '1 session'   THEN 1
+    WHEN '2 sessions'  THEN 2
+    WHEN '3-4 sessions' THEN 3
+    WHEN '4+ sessions'  THEN 4
+  END;

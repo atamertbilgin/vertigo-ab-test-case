@@ -1,0 +1,55 @@
+-- 1) D0 (Install day) playtime segmentation
+WITH d0 AS (
+  SELECT
+    user_id,
+    install_date,
+    total_session_duration,
+    CASE
+      WHEN total_session_duration < 300 THEN '0-5 min'
+      WHEN total_session_duration < 600 THEN '5-10 min'
+      WHEN total_session_duration < 900 THEN '10-15 min'
+      WHEN total_session_duration < 1800 THEN '15-30 min'
+      ELSE '30+ min'
+    END AS play_segment
+  FROM `vertigo-casestudy.dataset.alldata`
+  WHERE event_date = install_date
+),
+
+-- 2) Retention table by day offsets
+retention AS (
+  SELECT
+    d0.play_segment,
+    d0.user_id,
+    -- retention flags
+    MAX(CASE WHEN a.event_date = DATE_ADD(d0.install_date, INTERVAL 0 DAY) THEN 1 ELSE 0 END) AS d0_ret,
+    MAX(CASE WHEN a.event_date = DATE_ADD(d0.install_date, INTERVAL 1 DAY) THEN 1 ELSE 0 END) AS d1_ret,
+    MAX(CASE WHEN a.event_date = DATE_ADD(d0.install_date, INTERVAL 3 DAY) THEN 1 ELSE 0 END) AS d3_ret,
+    MAX(CASE WHEN a.event_date = DATE_ADD(d0.install_date, INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS d7_ret,
+    MAX(CASE WHEN a.event_date = DATE_ADD(d0.install_date, INTERVAL 14 DAY) THEN 1 ELSE 0 END) AS d14_ret,
+    MAX(CASE WHEN a.event_date = DATE_ADD(d0.install_date, INTERVAL 21 DAY) THEN 1 ELSE 0 END) AS d21_ret
+  FROM d0
+  LEFT JOIN `vertigo-casestudy.dataset.alldata` a
+    ON a.user_id = d0.user_id
+  GROUP BY 1,2
+)
+
+-- 3) Aggregate retention rates per segment
+SELECT
+  play_segment,
+  COUNT(*) AS users,
+  avg(d0_ret) as d0_retention,
+  AVG(d1_ret) AS d1_retention,
+  AVG(d3_ret) AS d3_retention,
+  AVG(d7_ret) AS d7_retention,
+  AVG(d14_ret) AS d14_retention,
+  AVG(d21_ret) AS d21_retention
+FROM retention
+GROUP BY play_segment
+ORDER BY
+  CASE play_segment
+    WHEN '0-5 min' THEN 1
+    WHEN '5-10 min' THEN 2
+    WHEN '10-15 min' THEN 3
+    WHEN '15-30 min' THEN 4
+    WHEN '30+ min' THEN 5
+  END;

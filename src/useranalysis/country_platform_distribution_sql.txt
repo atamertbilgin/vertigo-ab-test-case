@@ -1,0 +1,20 @@
+SELECT
+  platform,
+  COUNT(DISTINCT user_id) AS users
+FROM `vertigo-casestudy.dataset.alldata`
+WHERE install_date BETWEEN '2024-02-15' AND '2024-03-15'
+  AND event_date = install_date
+GROUP BY platform
+ORDER BY users DESC;
+
+-----
+
+SELECT
+  country,
+  COUNT(DISTINCT user_id) AS users
+FROM `vertigo-casestudy.dataset.alldata`
+WHERE install_date BETWEEN '2024-02-15' AND '2024-03-15'
+  AND event_date = install_date
+GROUP BY country
+ORDER BY users DESC;
+

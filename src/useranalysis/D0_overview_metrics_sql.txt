@@ -1,0 +1,19 @@
+SELECT
+  -- Core averages
+  AVG(total_session_duration) AS avg_session_duration_sec,
+  AVG(total_session_count) AS avg_session_count,
+  AVG(match_start_count) AS avg_match_start_count,
+
+  -- Victory rate
+  AVG(SAFE_DIVIDE(victory_count, match_end_count)) AS avg_victory_rate,
+
+  -- Revenue KPIs
+  AVG(iap_revenue) AS avg_iap_rev,
+  AVG(ad_revenue) AS avg_ad_rev,
+
+  -- Population size
+  COUNT(DISTINCT user_id) AS unique_users
+
+FROM `vertigo-casestudy.dataset.alldata`
+WHERE install_date BETWEEN '2024-02-15' AND '2024-03-15'
+  AND event_date = install_date;

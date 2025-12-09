@@ -1,0 +1,75 @@
+WITH d0 AS (
+  SELECT
+    user_id,
+    install_date,
+    match_start_count AS matches,
+    victory_count,
+    defeat_count,
+    SAFE_DIVIDE(victory_count, match_start_count) AS win_rate,
+
+    -- Match count segmentation
+    CASE
+      WHEN match_start_count = 1 THEN '1 match'
+      WHEN match_start_count BETWEEN 2 AND 3 THEN '2-3 matches'
+      WHEN match_start_count BETWEEN 4 AND 7 THEN '4-7 matches'
+      WHEN match_start_count BETWEEN 8 AND 15 THEN '8-15 matches'
+      WHEN match_start_count BETWEEN 16 AND 30 THEN '16-30 matches'
+      ELSE '30+ matches'
+    END AS match_segment,
+
+    -- Win rate segmentation
+    CASE
+      WHEN SAFE_DIVIDE(victory_count, match_start_count) < 0.25 THEN '0-25%'
+      WHEN SAFE_DIVIDE(victory_count, match_start_count) < 0.50 THEN '26-50%'
+      WHEN SAFE_DIVIDE(victory_count, match_start_count) < 0.75 THEN '51-75%'
+      ELSE '76-100%'
+    END AS win_segment
+
+  FROM `vertigo-casestudy.dataset.alldata`
+  WHERE event_date = install_date
+    AND install_date BETWEEN '2024-02-15' AND '2024-03-15'
+),
+
+-- Retention table
+ret AS (
+  SELECT
+    d0.match_segment,
+    d0.win_segment,
+    d0.user_id,
+
+    MAX(CASE WHEN a.event_date = DATE_ADD(d0.install_date, INTERVAL 1 DAY) THEN 1 ELSE 0 END) AS d1_ret,
+    MAX(CASE WHEN a.event_date = DATE_ADD(d0.install_date, INTERVAL 3 DAY) THEN 1 ELSE 0 END) AS d3_ret,
+    MAX(CASE WHEN a.event_date = DATE_ADD(d0.install_date, INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS d7_ret,
+    MAX(CASE WHEN a.event_date = DATE_ADD(d0.install_date, INTERVAL 14 DAY) THEN 1 ELSE 0 END) AS d14_ret
+
+  FROM d0
+  LEFT JOIN `vertigo-casestudy.dataset.alldata` a
+    ON d0.user_id = a.user_id
+  GROUP BY 1, 2, 3
+)
+
+SELECT
+  match_segment,
+  win_segment,
+  COUNT(*) AS users,
+  AVG(d1_ret) AS d1_retention,
+  AVG(d3_ret) AS d3_retention,
+  AVG(d7_ret) AS d7_retention,
+  AVG(d14_ret) AS d14_retention
+FROM ret
+GROUP BY match_segment, win_segment
+ORDER BY
+  CASE match_segment
+    WHEN '1 match' THEN 1
+    WHEN '2-3 matches' THEN 2
+    WHEN '4-7 matches' THEN 3
+    WHEN '8-15 matches' THEN 4
+    WHEN '16-30 matches' THEN 5
+    WHEN '30+ matches' THEN 6
+  END,
+  CASE win_segment
+    WHEN '0-25%' THEN 1
+    WHEN '26-50%' THEN 2
+    WHEN '51-75%' THEN 3
+    WHEN '76-100%' THEN 4
+  END;

@@ -1,0 +1,36 @@
+-- Daily Avg Session Duration Trend
+SELECT
+  event_date,
+  AVG(total_session_duration) AS avg_session_duration_sec,
+  COUNT(DISTINCT user_id) AS users_active
+FROM `vertigo-casestudy.dataset.alldata`
+WHERE install_date BETWEEN '2024-02-15' AND '2024-03-15'
+GROUP BY event_date
+ORDER BY event_date;
+
+-- Daily Avg IAP and Ad Revenue Trend
+WITH daily AS (
+  SELECT
+    event_date,
+    
+    COUNT(DISTINCT user_id) AS dau,
+    
+    SUM(iap_revenue) AS total_iap_revenue,
+    SUM(ad_revenue) AS total_ad_revenue
+    
+  FROM `vertigo-casestudy.dataset.alldata`
+  WHERE event_date BETWEEN '2024-02-15' AND '2024-03-15'
+  and install_date BETWEEN '2024-02-15' AND '2024-03-15'
+  GROUP BY event_date
+)
+
+SELECT
+  event_date,
+  
+  SAFE_DIVIDE(total_iap_revenue, dau) AS iap_per_dau,
+  SAFE_DIVIDE(total_ad_revenue, dau) AS ad_per_dau
+
+FROM daily
+ORDER BY event_date;
+
+
