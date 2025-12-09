@@ -23,7 +23,7 @@
 │       └── scenarios.py             # Scenario helpers
 │
 └── outputs/
-    └── figures/                     # Saved plots for README
+    └── figurestask1/                     # Saved plots for README
         ├── cumulative_rev_15days.png
         ├── cumulative_rev_30days.png
         ├── cumulative_rev_with_10day_sale.png
@@ -59,7 +59,7 @@ Variant B retains players slightly worse on Day1 but significantly better in mid
 This leads to more stacked cohorts by Day 15.
 Variant B has higher DAU on Day 15.
 
-<img src="outputs/figures/dau_over_15_days.png" width="600">
+<img src="outputs/figurestask1/dau_over_15_days.png" width="600">
 
 ---
 
@@ -74,7 +74,7 @@ For this monetization level:
 
 Variant A earns slightly more by Day 15.
 
-<img src="outputs/figures/cumulative_rev_15days.png" width="600">
+<img src="outputs/figurestask1/cumulative_rev_15days.png" width="600">
 
 ---
 
@@ -85,7 +85,7 @@ Variant B’s D7/D14 advantage compounds, and by stacking more surviving cohorts
 
 By Day 30, Variant B earns more total revenue.
 
-<img src="outputs/figures/cumulative_rev_30days.png" width="600">
+<img src="outputs/figurestask1/cumulative_rev_30days.png" width="600">
 
 ---
 
@@ -98,7 +98,7 @@ DAU unchanged
 IAP revenue increases sharply for 10 days
 The effect is large but temporary and it does not change which variant earns more total money by Day 30.
 
-<img src="outputs/figures/cumulative_rev_with_10day_sale.png" width="600">
+<img src="outputs/figurestask1/cumulative_rev_with_10day_sale.png" width="600">
 
 ---
 
@@ -112,14 +112,14 @@ New flow:
 New source cohorts follow exponential retention
 This creates a small but permanent DAU increase every day.
 
-<img src="outputs/figures/cumulative_rev_with_new_source.png" width="600">
+<img src="outputs/figurestask1/cumulative_rev_with_new_source.png" width="600">
 
 ---
 
 ## f) Sale vs. New User Source — Which Should Be Prioritized?
 Comparison (Variant B shown since I think it is the superior one):
 
-<img src="outputs/figures/sale_vs_new_source.png" width="600">
+<img src="outputs/figurestask1/sale_vs_new_source.png" width="600">
 
 Interpretation
 The 10-day sale creates a strong short-term spike and gets ahead of the curve for that period
